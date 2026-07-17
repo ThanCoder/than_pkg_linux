@@ -11,6 +11,7 @@
 #include "than_pkg_linux_plugin_private.h"
 
 FlTextureRegistrar* g_texture_registrar = nullptr;
+GtkWidget* g_toplevel_window = nullptr;
 
 #define THAN_PKG_LINUX_PLUGIN(obj)                                     \
   (G_TYPE_CHECK_INSTANCE_CAST((obj), than_pkg_linux_plugin_get_type(), \
@@ -31,19 +32,13 @@ static void than_pkg_linux_plugin_handle_method_call(
 
   if (strcmp(method, "getPlatformVersion") == 0) {
     response = get_platform_version();
+  } else if (strcmp(method, "getWindowSize") == 0) {
+    response = get_window_size();
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
 
   fl_method_call_respond(method_call, response, nullptr);
-}
-
-FlMethodResponse* get_platform_version() {
-  struct utsname uname_data = {};
-  uname(&uname_data);
-  g_autofree gchar* version = g_strdup_printf("Linux %s", uname_data.version);
-  g_autoptr(FlValue) result = fl_value_new_string(version);
-  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
 }
 
 static void than_pkg_linux_plugin_dispose(GObject* object) {
@@ -67,6 +62,12 @@ void than_pkg_linux_plugin_register_with_registrar(
   // ကောက်သိမ်းလိုက်ခြင်း
   g_texture_registrar = fl_plugin_registrar_get_texture_registrar(registrar);
 
+  // Window pointer ကို ရယူခြင်း
+  FlView* view = fl_plugin_registrar_get_view(registrar);
+  if (view != nullptr) {
+    g_toplevel_window = gtk_widget_get_toplevel(GTK_WIDGET(view));
+  }
+
   ThanPkgLinuxPlugin* plugin = THAN_PKG_LINUX_PLUGIN(
       g_object_new(than_pkg_linux_plugin_get_type(), nullptr));
 
@@ -79,6 +80,37 @@ void than_pkg_linux_plugin_register_with_registrar(
 
   g_object_unref(plugin);
 }
+
+/*********************Method Channel Func**************************** */
+FlMethodResponse* get_platform_version() {
+  struct utsname uname_data = {};
+  uname(&uname_data);
+  g_autofree gchar* version = g_strdup_printf("Linux %s", uname_data.version);
+  g_autoptr(FlValue) result = fl_value_new_string(version);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// func
+FlMethodResponse* get_window_size() {
+  if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
+    return FL_METHOD_RESPONSE(
+        fl_method_error_response_new("no_window", "Window not found", nullptr));
+  }
+
+  gint width = 0;
+  gint height = 0;
+  // Window ရဲ့ လက်ရှိ size ကို ယူခြင်း
+  gtk_window_get_size(GTK_WINDOW(g_toplevel_window), &width, &height);
+
+  g_autoptr(FlValue) result = fl_value_new_map();
+  fl_value_set_string_take(result, "width", fl_value_new_int(width));
+  fl_value_set_string_take(result, "height", fl_value_new_int(height));
+
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+/*********************Method Channel Func**************************** */
+
+/*********************Texture Func**************************** */
 
 // texture register
 
@@ -202,3 +234,5 @@ void than_pkg_linux_plugin_ffi_update_texture_pixels(int64_t texture_id,
     }
   }
 }
+
+/*********************Texture Func**************************** */
