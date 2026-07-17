@@ -1,0 +1,7 @@
+CompileFlags:
+  Add: [
+    "-I/usr/include/glib-2.0",
+    "-I/usr/lib/x64-linux-gnu/glib-2.0/include",
+    # မိမိစက်ထဲက flutter SDK path ကို ဒီနေရာမှာ အစားထိုးပေးပါ
+    "-I/home/thancoder/flutter/bin/cache/artifacts/engine/linux-x64"
+  ]
