@@ -1,9 +1,4 @@
 // ignore_for_file: avoid_print
-
-import 'dart:async';
-import 'dart:ffi';
-
-import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 
@@ -26,22 +21,13 @@ class _TextureIdExampleState extends State<TextureIdExample> {
     if (textureId != null) {
       ThanPkgLinux.getInstance.textureHandler.releaseTexture(textureId!);
     }
-    if (buffer != nullptr) {
-      calloc.free(buffer);
-    }
-    loopTimer?.cancel();
+
     super.dispose();
   }
 
   int? textureId;
-  Pointer<Uint8> buffer = nullptr;
-  Timer? loopTimer;
 
   void genereateColors() {
-    if (buffer == nullptr) {
-      buffer = calloc.call<Uint8>();
-    }
-
     textureId ??= ThanPkgLinux.getInstance.textureHandler.createTextureId();
 
     // // test colors
@@ -60,10 +46,6 @@ class _TextureIdExampleState extends State<TextureIdExample> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // if (textureId == null) {
-          //   print('texture id is null!');
-          //   return;
-          // }
           genereateColors();
         },
       ),
