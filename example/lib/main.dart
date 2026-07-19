@@ -1,5 +1,8 @@
+// ignore_for_file: unused_local_variable, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
+import 'package:than_pkg_linux_example/texture_id_example.dart';
 
 void main() {
   runApp(MaterialApp(home: const MyApp()));
@@ -15,9 +18,13 @@ class MyApp extends StatelessWidget {
       body: Placeholder(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final pkg = ThanPkgLinux.instance.channel;
-          print('version: ${await pkg.getVersion()}');
-          print('getWindowSize: ${await pkg.getWindowSize()}');
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TextureIdExample()),
+          );
+
+          print('ThanDev Start....');
+          final pkg = ThanPkgLinux.getInstance.textureHandler;
         },
       ),
     );

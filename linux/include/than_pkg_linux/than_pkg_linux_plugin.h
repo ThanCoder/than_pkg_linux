@@ -26,13 +26,12 @@ FLUTTER_PLUGIN_EXPORT void than_pkg_linux_plugin_register_with_registrar(
 FLUTTER_PLUGIN_EXPORT int64_t than_pkg_linux_plugin_ffi_create_texture();
 
 // Texture ကို အပြီးဖျက်မယ့် function ကြေညာခြင်း
-FLUTTER_PLUGIN_EXPORT void than_pkg_linux_plugin_ffi_dispose_texture(int64_t texture_id);
+FLUTTER_PLUGIN_EXPORT void than_pkg_linux_plugin_ffi_dispose_texture(
+    int64_t texture_id);
 
 // ၂။ ရလာတဲ့ ID ထဲကို Pixel bufferPointer သွားချိတ်မယ့် function
-FLUTTER_PLUGIN_EXPORT void than_pkg_linux_plugin_ffi_update_texture_pixels(int64_t texture_id,
-                                                     uint8_t* buffer,
-                                                     uint32_t width,
-                                                     uint32_t height);
+FLUTTER_PLUGIN_EXPORT void than_pkg_linux_plugin_ffi_update_texture_pixels(
+    int64_t texture_id, unsigned char* buffer, uint32_t width, uint32_t height);
 
 G_END_DECLS
 
