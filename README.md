@@ -1,5 +1,13 @@
 # than_pkg_linux
 
+A powerful Flutter plugin for Linux desktop development, providing advanced window management features and low-level pixel buffer texture handling.
+
+## Features
+
+*   **Window Management (`MChannel`):** Easily control window state, size, visibility, and positioning (center, minimize, full screen, etc.) directly from Dart.
+*   **Low-Level Texture Handling (`TextureHandler`):** Render and update raw pixel buffers efficiently using Flutter's `Texture` widget on Linux.
+
+---
 
 ### Example
 ```dart
