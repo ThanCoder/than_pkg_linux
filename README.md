@@ -19,7 +19,18 @@ ThanPkgLinux.getInstance.[whatever your want!]
 [Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
 + [x] [`Info`](#info-example)
 + [x] [`PathProvider`](#pathprovider-example)
-  
++ [x] [`Launcher`](#launcher-example)
+
+---
+
+### Launcher Example
+```dart
+final pkg = ThanPkgLinux.getInstance.launcher;
+
+await pkg.launchUrl('https://pub.dev/'); // bool
+await pkg.launchPath('[path]',);
+await pkg.launchApp('vlc')// bool
+```
 
 ### Info Example
 ```dart
@@ -28,6 +39,7 @@ final pkg = ThanPkgLinux.getInstance.info;
 pkg.getAppInfo()// AppInfo(packageName: com.example.than_pkg_linux, version: 1.0.0, buildNumber: 1)
 pkg.getOsRelease() //Linux
 pkg.getVersion() //Linux #1 SMP PREEMPT_DYNAMIC Debian 6.12.101-1 (2026-08-05)
+pkg.getInstalledApps() // `[InstalledApp(id: $id, name: $name, executable: $executable)]`
 ```
 
 ### PathProvider Example

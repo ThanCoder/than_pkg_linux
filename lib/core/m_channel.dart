@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:than_pkg_linux/core/types.dart';
+import 'package:than_pkg_linux/core/models/t_window_size.dart';
 
 class MChannel {
   final MethodChannel _channel;

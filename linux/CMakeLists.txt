@@ -41,6 +41,7 @@ target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE gio-unix-2.0) # launcher အတွက်
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
@@ -86,6 +87,7 @@ if(${include_${PROJECT_NAME}_tests})
     target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
     target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
     target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
+
 
     # Enable automatic test discovery.
     include(GoogleTest)

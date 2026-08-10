@@ -2,3 +2,4 @@
 
 + Added `PkgInfo`
 + Added `PathProvider`
++ Added `Launcher`

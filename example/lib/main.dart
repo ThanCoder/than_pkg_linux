@@ -18,8 +18,9 @@ class MyApp extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // print('ThanDev Start....');
-          final pkg = ThanPkgLinux.getInstance.pathHandler;
-          print(await pkg.getApplicationTemporaryDirectory());
+          final pkg = ThanPkgLinux.getInstance.launcher;
+
+          print(await pkg.launchApp('vlc'));
         },
       ),
     );

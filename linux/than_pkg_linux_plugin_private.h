@@ -36,6 +36,13 @@ FlMethodResponse *get_application_support_directory();
 FlMethodResponse *get_downloads_directory();
 FlMethodResponse *get_desktop_directory();
 FlMethodResponse *get_pictures_directory();
-
 FlMethodResponse *get_executable_path();
 FlMethodResponse *get_working_directory();
+
+/********************* Launcher Funcs **************************** */
+FlMethodResponse *launch_url(FlValue *args);  // Open Web URL (https://...)
+FlMethodResponse *launch_path(FlValue *args); // Open File or Folder Path
+// Launch App by Desktop ID or Command
+FlMethodResponse *launch_app(FlValue *args);
+// Get list of installed system applications
+FlMethodResponse *get_installed_apps();
