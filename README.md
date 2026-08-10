@@ -17,7 +17,47 @@ ThanPkgLinux.getInstance.[whatever your want!]
 + [x] [`MChannel`](#m-channel)
 + [x] [`TextureHandler`](#texturehandler)
 [Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
++ [x] [`Info`](#info-example)
++ [x] [`PathProvider`](#pathprovider-example)
   
+
+### Info Example
+```dart
+final pkg = ThanPkgLinux.getInstance.info;
+
+pkg.getAppInfo()// AppInfo(packageName: com.example.than_pkg_linux, version: 1.0.0, buildNumber: 1)
+pkg.getOsRelease() //Linux
+pkg.getVersion() //Linux #1 SMP PREEMPT_DYNAMIC Debian 6.12.101-1 (2026-08-05)
+```
+
+### PathProvider Example
+```dart
+final pkg = ThanPkgLinux.getInstance.pathHandler;
+
+pkg.getTemporaryDirectory()// /home/[host]/.cache
+pkg.getDesktopDirectory() ///home/[host]/Desktop
+pkg.getDownloadsDirectory() // /home/[host]/Downloads
+pkg.getPicturesDirectory() // /home/[host]/Pictures
+pkg.getApplicationDocumentsDirectory() ///home/[host]/Documents
+pkg.getApplicationSupportDirectory() // /home/[host]/.config
+
+pkg.getExecutablePath() 
+// `/home/[host]/projects/[project path]/build/linux/x64/debug/bundle/than_pkg_linux_example`
+
+pkg.getWorkingDirectory() 
+// `/home/[host]/projects/[project path]/example` 
+
+pkg.getApplicationTemporaryDirectory() 
+// `/home/[host]/.cache/[com.example.than_pkg_linux]`
+
+
+pkg.getApplicationConfigDirectory() 
+// `/home/[host]/.config/[com.example.than_pkg_linux]`
+
+pkg.getApplicationHomeDirectory() 
+// `/home/[host]/[com.example.than_pkg_linux]`
+
+```
 
 ### M Channel
 ```dart

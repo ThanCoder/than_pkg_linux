@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
-import 'package:than_pkg_linux_example/texture_id_example.dart';
 
 void main() {
   runApp(MaterialApp(home: const MyApp()));
@@ -18,13 +17,9 @@ class MyApp extends StatelessWidget {
       body: Placeholder(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TextureIdExample()),
-          );
-
-          print('ThanDev Start....');
-          final pkg = ThanPkgLinux.getInstance.textureHandler;
+          // print('ThanDev Start....');
+          final pkg = ThanPkgLinux.getInstance.pathHandler;
+          print(await pkg.getApplicationTemporaryDirectory());
         },
       ),
     );

@@ -11,11 +11,11 @@
 
 #include "than_pkg_linux_plugin_private.h"
 
-FlTextureRegistrar* g_texture_registrar = nullptr;
-GtkWidget* g_toplevel_window = nullptr;
+FlTextureRegistrar *g_texture_registrar = nullptr;
+GtkWidget *g_toplevel_window = nullptr;
 
-#define THAN_PKG_LINUX_PLUGIN(obj)                                     \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), than_pkg_linux_plugin_get_type(), \
+#define THAN_PKG_LINUX_PLUGIN(obj)                                             \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), than_pkg_linux_plugin_get_type(),         \
                               ThanPkgLinuxPlugin))
 
 struct _ThanPkgLinuxPlugin {
@@ -27,20 +27,27 @@ G_DEFINE_TYPE(ThanPkgLinuxPlugin, than_pkg_linux_plugin, g_object_get_type())
 //**********ON Close Event Listener********** */
 bool is_flutter_listening = false;
 /// method channel
-static FlMethodChannel* methodChannel = nullptr;
+static FlMethodChannel *methodChannel = nullptr;
 
 //**********ON Close Event Listener********** */
 
 // Called when a method call is received from Flutter.
-static void than_pkg_linux_plugin_handle_method_call(
-    ThanPkgLinuxPlugin* self, FlMethodCall* method_call) {
+static void
+than_pkg_linux_plugin_handle_method_call(ThanPkgLinuxPlugin *self,
+                                         FlMethodCall *method_call) {
   g_autoptr(FlMethodResponse) response = nullptr;
 
-  const gchar* method = fl_method_call_get_name(method_call);
-
+  const gchar *method = fl_method_call_get_name(method_call);
+  // info
   if (strcmp(method, "getPlatformVersion") == 0) {
     response = get_platform_version();
-  } else if (strcmp(method, "getWindowSize") == 0) {
+  } else if (strcmp(method, "getAppInfo") == 0) {
+    response = get_app_info();
+  } else if (strcmp(method, "getOsRelease") == 0) {
+    response = get_os_release();
+  }
+  // channel
+  else if (strcmp(method, "getWindowSize") == 0) {
     response = get_window_size();
   } else if (strcmp(method, "setFullscreen") == 0) {
     response = set_fullscreen(fl_method_call_get_args(method_call));
@@ -64,29 +71,51 @@ static void than_pkg_linux_plugin_handle_method_call(
     response = set_window_bordered(fl_method_call_get_args(method_call));
   } else if (strcmp(method, "closeWindow") == 0) {
     response = close_window();
-  } else if (strcmp(method, "setCloseHandlerListening") == 0) {
+  }
+  // event
+  else if (strcmp(method, "setCloseHandlerListening") == 0) {
     response =
         set_close_handler_listening(fl_method_call_get_args(method_call));
-  } else {
+  }
+  // pathPath Provider Funcs
+  else if (strcmp(method, "get_application_documents_directory") == 0) {
+    response = get_application_documents_directory();
+  } else if (strcmp(method, "get_temporary_directory") == 0) {
+    response = get_temporary_directory();
+  } else if (strcmp(method, "get_application_support_directory") == 0) {
+    response = get_application_support_directory();
+  } else if (strcmp(method, "get_downloads_directory") == 0) {
+    response = get_downloads_directory();
+  } else if (strcmp(method, "get_desktop_directory") == 0) {
+    response = get_desktop_directory();
+  } else if (strcmp(method, "get_pictures_directory") == 0) {
+    response = get_pictures_directory();
+  } else if (strcmp(method, "get_executable_path") == 0) {
+    response = get_executable_path();
+  } else if (strcmp(method, "get_working_directory") == 0) {
+    response = get_working_directory();
+  }
+  // not implemented
+  else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
 
   fl_method_call_respond(method_call, response, nullptr);
 }
 
-static void than_pkg_linux_plugin_dispose(GObject* object) {
+static void than_pkg_linux_plugin_dispose(GObject *object) {
   G_OBJECT_CLASS(than_pkg_linux_plugin_parent_class)->dispose(object);
 }
 
-static void than_pkg_linux_plugin_class_init(ThanPkgLinuxPluginClass* klass) {
+static void than_pkg_linux_plugin_class_init(ThanPkgLinuxPluginClass *klass) {
   G_OBJECT_CLASS(klass)->dispose = than_pkg_linux_plugin_dispose;
 }
 
-static void than_pkg_linux_plugin_init(ThanPkgLinuxPlugin* self) {}
+static void than_pkg_linux_plugin_init(ThanPkgLinuxPlugin *self) {}
 
-static void method_call_cb(FlMethodChannel* channel, FlMethodCall* method_call,
+static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
                            gpointer user_data) {
-  ThanPkgLinuxPlugin* plugin = THAN_PKG_LINUX_PLUGIN(user_data);
+  ThanPkgLinuxPlugin *plugin = THAN_PKG_LINUX_PLUGIN(user_data);
   // global variable ထဲကို ထည့်ခြင်း
   if (methodChannel == nullptr) {
     methodChannel = channel;
@@ -98,19 +127,19 @@ static void method_call_cb(FlMethodChannel* channel, FlMethodCall* method_call,
 
 // plugin register လုပ်တဲ့ နေရာ
 void than_pkg_linux_plugin_register_with_registrar(
-    FlPluginRegistrar* registrar) {
+    FlPluginRegistrar *registrar) {
   // ကောက်သိမ်းလိုက်ခြင်း
   g_texture_registrar = fl_plugin_registrar_get_texture_registrar(registrar);
 
   // Window pointer ကို ရယူခြင်း
-  FlView* view = fl_plugin_registrar_get_view(registrar);
+  FlView *view = fl_plugin_registrar_get_view(registrar);
   if (view != nullptr) {
     g_toplevel_window = gtk_widget_get_toplevel(GTK_WIDGET(view));
 
     //**********ON Close Event Listener********** */
   }
 
-  ThanPkgLinuxPlugin* plugin = THAN_PKG_LINUX_PLUGIN(
+  ThanPkgLinuxPlugin *plugin = THAN_PKG_LINUX_PLUGIN(
       g_object_new(than_pkg_linux_plugin_get_type(), nullptr));
 
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
@@ -124,16 +153,165 @@ void than_pkg_linux_plugin_register_with_registrar(
 }
 
 /*********************Method Channel Func**************************** */
-FlMethodResponse* get_platform_version() {
+
+/********************* Path Provider Funcs **************************** */
+
+// 1. Documents Directory (~/Documents)
+FlMethodResponse *get_application_documents_directory() {
+  const gchar *path = g_get_user_special_dir(G_USER_DIRECTORY_DOCUMENTS);
+  if (path == nullptr)
+    path = g_get_home_dir();
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// 2. Temporary / Cache Directory (~/.cache သို့မဟုတ် /tmp)
+FlMethodResponse *get_temporary_directory() {
+  const gchar *path = g_get_user_cache_dir();
+  if (path == nullptr)
+    path = g_get_tmp_dir();
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// 3. Application Support / Config Directory (~/.config)
+FlMethodResponse *get_application_support_directory() {
+  const gchar *path = g_get_user_config_dir();
+  if (path == nullptr)
+    path = g_get_home_dir();
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// 4. Downloads Directory (~/Downloads)
+FlMethodResponse *get_downloads_directory() {
+  const gchar *path = g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD);
+  if (path == nullptr)
+    path = g_get_home_dir();
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// 5. Desktop Directory (~/Desktop)
+FlMethodResponse *get_desktop_directory() {
+  const gchar *path = g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP);
+  if (path == nullptr)
+    path = g_get_home_dir();
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// 6. Pictures Directory (~/Pictures)
+FlMethodResponse *get_pictures_directory() {
+  const gchar *path = g_get_user_special_dir(G_USER_DIRECTORY_PICTURES);
+  if (path == nullptr)
+    path = g_get_home_dir();
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+/********************* Path Funcs **************************** */
+
+// 1. Get Executable Path (e.g.,
+// /home/user/my_app/build/linux/x64/debug/bundle/my_app)
+FlMethodResponse *get_executable_path() {
+  char path[1024] = {0};
+
+  // Read the symbolic link /proc/self/exe on Linux
+  ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
+  if (count == -1) {
+    return FL_METHOD_RESPONSE(fl_method_error_response_new(
+        "PATH_ERROR", "Failed to read /proc/self/exe link", nullptr));
+  }
+
+  path[count] = '\0'; // Null-terminate the path string
+
+  g_autoptr(FlValue) result = fl_value_new_string(path);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// 2. Get Current Working Directory (e.g., /home/user/my_app)
+FlMethodResponse *get_working_directory() {
+  g_autofree gchar *cwd = g_get_current_dir();
+
+  if (cwd == nullptr) {
+    return FL_METHOD_RESPONSE(fl_method_error_response_new(
+        "CWD_ERROR", "Failed to get current working directory", nullptr));
+  }
+
+  g_autoptr(FlValue) result = fl_value_new_string(cwd);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+/********************* System Info Func **************************** */
+FlMethodResponse *get_os_release() {
+  g_autofree gchar *pretty_name = nullptr;
+
+  // /etc/os-release ကို ဖတ်ယူခြင်း
+  if (g_file_test("/etc/os-release", G_FILE_TEST_EXISTS)) {
+    g_autoptr(GKeyFile) key_file = g_key_file_new();
+    if (g_key_file_load_from_file(key_file, "/etc/os-release", G_KEY_FILE_NONE,
+                                  nullptr)) {
+      pretty_name =
+          g_key_file_get_string(key_file, "os-release", "PRETTY_NAME", nullptr);
+    }
+  }
+
+  // ဖတ်လို့မရခဲ့ရင် fallback ထားပေးခြင်း
+  if (pretty_name == nullptr) {
+    pretty_name = g_strdup("Linux");
+  }
+
+  g_autoptr(FlValue) result = fl_value_new_string(pretty_name);
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
+// version
+FlMethodResponse *get_platform_version() {
   struct utsname uname_data = {};
   uname(&uname_data);
-  g_autofree gchar* version = g_strdup_printf("Linux %s", uname_data.version);
+  g_autofree gchar *version = g_strdup_printf("Linux %s", uname_data.version);
   g_autoptr(FlValue) result = fl_value_new_string(version);
   return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
 }
 
+/*********************app info**************************** */
+FlMethodResponse *get_app_info() {
+  g_autoptr(FlValue) result = fl_value_new_map();
+
+  // Package Name (Application ID) ရယူခြင်း
+  GApplication *app = g_application_get_default();
+  const gchar *app_id = app ? g_application_get_application_id(app) : nullptr;
+  fl_value_set_string_take(result, "packageName",
+                           fl_value_new_string(app_id ? app_id : "unknown"));
+
+  // App Version (CMake / Pubspec ကလာသော Value)
+#ifdef FLUTTER_BUILD_NAME
+  fl_value_set_string_take(result, "version",
+                           fl_value_new_string(FLUTTER_BUILD_NAME));
+#else
+  fl_value_set_string_take(result, "version", fl_value_new_string("1.0.0"));
+#endif
+
+  // Build Number
+#ifdef FLUTTER_BUILD_NUMBER
+  fl_value_set_string_take(result, "buildNumber",
+                           fl_value_new_string(FLUTTER_BUILD_NUMBER));
+#else
+  fl_value_set_string_take(result, "buildNumber", fl_value_new_string("1"));
+#endif
+
+  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
 // func
-FlMethodResponse* get_window_size() {
+FlMethodResponse *get_window_size() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -151,13 +329,13 @@ FlMethodResponse* get_window_size() {
   return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
 }
 
-FlMethodResponse* get_window_title() {
+FlMethodResponse *get_window_title() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
   }
 
-  const gchar* title = gtk_window_get_title(GTK_WINDOW(g_toplevel_window));
+  const gchar *title = gtk_window_get_title(GTK_WINDOW(g_toplevel_window));
   // Title မရှိရင် empty string ပြန်မယ်
   g_autoptr(FlValue) result = fl_value_new_string(title ? title : "");
 
@@ -165,7 +343,7 @@ FlMethodResponse* get_window_title() {
 }
 
 // 2. Window Title ကို ပြောင်းလဲခြင်း
-FlMethodResponse* set_window_title(FlValue* args) {
+FlMethodResponse *set_window_title(FlValue *args) {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -177,14 +355,14 @@ FlMethodResponse* set_window_title(FlValue* args) {
         "bad_arguments", "Title must be a string", nullptr));
   }
 
-  const gchar* new_title = fl_value_get_string(args);
+  const gchar *new_title = fl_value_get_string(args);
   gtk_window_set_title(GTK_WINDOW(g_toplevel_window), new_title);
 
   return FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
 }
 
 // Fullscreen အဖွင့် / အပိတ် လုပ်ခြင်း (bool argument လက်ခံသည်)
-FlMethodResponse* set_fullscreen(FlValue* args) {
+FlMethodResponse *set_fullscreen(FlValue *args) {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -209,13 +387,13 @@ FlMethodResponse* set_fullscreen(FlValue* args) {
 }
 
 // 3. Fullscreen ကို Toggle (အဖွင့်/အပိတ်) လုပ်ခြင်း
-FlMethodResponse* toggle_fullscreen() {
+FlMethodResponse *toggle_fullscreen() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
   }
 
-  GdkWindow* gdk_window = gtk_widget_get_window(GTK_WIDGET(g_toplevel_window));
+  GdkWindow *gdk_window = gtk_widget_get_window(GTK_WIDGET(g_toplevel_window));
   if (gdk_window != nullptr) {
     GdkWindowState state = gdk_window_get_state(gdk_window);
 
@@ -230,13 +408,13 @@ FlMethodResponse* toggle_fullscreen() {
   return FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
 }
 
-FlMethodResponse* is_fullscreen() {
+FlMethodResponse *is_fullscreen() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
   }
 
-  GdkWindow* gdk_window = gtk_widget_get_window(GTK_WIDGET(g_toplevel_window));
+  GdkWindow *gdk_window = gtk_widget_get_window(GTK_WIDGET(g_toplevel_window));
   bool isFullscreen = false;
 
   if (gdk_window != nullptr) {
@@ -250,7 +428,7 @@ FlMethodResponse* is_fullscreen() {
 }
 
 // Window ကို အောက်ချခြင်း (Minimize)
-FlMethodResponse* minimize_window() {
+FlMethodResponse *minimize_window() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -260,7 +438,7 @@ FlMethodResponse* minimize_window() {
 }
 
 // Window ကို အမြဲတမ်း အပေါ်ဆုံးမှာ ထားခြင်း/ဖြုတ်ခြင်း (Always on Top)
-FlMethodResponse* set_keep_above(FlValue* args) {
+FlMethodResponse *set_keep_above(FlValue *args) {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -277,7 +455,7 @@ FlMethodResponse* set_keep_above(FlValue* args) {
 }
 
 // 1. Window ရဲ့ Size ကို စိတ်ကြိုက် သတ်မှတ်ခြင်း
-FlMethodResponse* set_window_size(FlValue* args) {
+FlMethodResponse *set_window_size(FlValue *args) {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -289,8 +467,8 @@ FlMethodResponse* set_window_size(FlValue* args) {
         "bad_arguments", "Args must be a Map", nullptr));
   }
 
-  FlValue* width_val = fl_value_lookup_string(args, "width");
-  FlValue* height_val = fl_value_lookup_string(args, "height");
+  FlValue *width_val = fl_value_lookup_string(args, "width");
+  FlValue *height_val = fl_value_lookup_string(args, "height");
 
   if (width_val == nullptr || height_val == nullptr) {
     return FL_METHOD_RESPONSE(fl_method_error_response_new(
@@ -305,7 +483,7 @@ FlMethodResponse* set_window_size(FlValue* args) {
 }
 
 // 2. Window ကို Screen ရဲ့ အလယ်တည့်တည့်သို့ ရွှေ့ခြင်း
-FlMethodResponse* center_window() {
+FlMethodResponse *center_window() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -318,7 +496,7 @@ FlMethodResponse* center_window() {
 
 // 3. Window ရဲ့ Default ဘောင် (Title Bar) ကို ဖျောက်ခြင်း/ပြခြင်း
 // Custom Title Bar ကို Flutter ဘက်ကနေ ကိုယ်တိုင် Design ဆွဲချင်ရင် သုံးပါတယ်
-FlMethodResponse* set_window_bordered(FlValue* args) {
+FlMethodResponse *set_window_bordered(FlValue *args) {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -335,7 +513,7 @@ FlMethodResponse* set_window_bordered(FlValue* args) {
 }
 
 // 4. Application ကို ချက်ချင်း ပိတ်ချလိုက်ခြင်း (Close Button အတွက်)
-FlMethodResponse* close_window() {
+FlMethodResponse *close_window() {
   if (g_toplevel_window == nullptr || !GTK_IS_WINDOW(g_toplevel_window)) {
     return FL_METHOD_RESPONSE(
         fl_method_error_response_new("no_window", "Window not found", nullptr));
@@ -349,7 +527,7 @@ FlMethodResponse* close_window() {
 //**********ON Close Event Listener********** */
 
 // Flutter က စောင့်နေကြောင်း C++ ဘက်ကို အသိပေးသည့် function
-FlMethodResponse* set_close_handler_listening(FlValue* args) {
+FlMethodResponse *set_close_handler_listening(FlValue *args) {
   if (fl_value_get_type(args) != FL_VALUE_TYPE_BOOL) {
     return FL_METHOD_RESPONSE(fl_method_error_response_new(
         "bad_arguments", "Arg must be bool", nullptr));
@@ -372,7 +550,7 @@ FlMethodResponse* set_close_handler_listening(FlValue* args) {
 // --- ၁။ GObject အတွက် လိုအပ်သော Struct နှင့် Typedef များ ---
 struct _MyCustomTexture {
   FlPixelBufferTexture parent_instance;
-  uint8_t* pixel_buffer;
+  uint8_t *pixel_buffer;
   uint32_t width;
   uint32_t height;
 };
@@ -383,34 +561,34 @@ typedef struct {
 } MyCustomTextureClass;
 
 #define MY_TYPE_CUSTOM_TEXTURE (my_custom_texture_get_type())
-#define MY_CUSTOM_TEXTURE(obj) \
+#define MY_CUSTOM_TEXTURE(obj)                                                 \
   (G_TYPE_CHECK_INSTANCE_CAST((obj), MY_TYPE_CUSTOM_TEXTURE, MyCustomTexture))
 
 // Global management အတွက် Modern C++ standard container များ
-static std::map<int64_t, MyCustomTexture*> g_active_textures;
+static std::map<int64_t, MyCustomTexture *> g_active_textures;
 static std::mutex g_texture_mutex;
 
 // *************************************************************
 // ပြင်လိုက်တဲ့နေရာ - အဟောင်းကို ဖျက်ပြီး ဒါနဲ့ အစားထိုးပါတယ်
 // Main ဖိုင်ထဲက registrar ကို လှမ်းမျှသုံးဖို့ ဖြစ်ပါတယ်
-extern FlTextureRegistrar* g_texture_registrar;
+extern FlTextureRegistrar *g_texture_registrar;
 // *************************************************************
 
 // --- ၂။ GObject Runtime System တွင် Type  ---
 G_DEFINE_TYPE(MyCustomTexture, my_custom_texture,
               fl_pixel_buffer_texture_get_type())
 
-static void my_custom_texture_init(MyCustomTexture* self) {
+static void my_custom_texture_init(MyCustomTexture *self) {
   self->pixel_buffer = nullptr;
   self->width = 0;
   self->height = 0;
 }
 
-static gboolean my_custom_texture_copy_pixels(FlPixelBufferTexture* texture,
-                                              const uint8_t** buffer,
-                                              uint32_t* width, uint32_t* height,
-                                              GError** error) {
-  auto* self = reinterpret_cast<MyCustomTexture*>(texture);
+static gboolean my_custom_texture_copy_pixels(FlPixelBufferTexture *texture,
+                                              const uint8_t **buffer,
+                                              uint32_t *width, uint32_t *height,
+                                              GError **error) {
+  auto *self = reinterpret_cast<MyCustomTexture *>(texture);
   if (!self || !self->pixel_buffer) {
     return FALSE;
   }
@@ -421,7 +599,7 @@ static gboolean my_custom_texture_copy_pixels(FlPixelBufferTexture* texture,
   return TRUE;
 }
 
-static void my_custom_texture_class_init(MyCustomTextureClass* klass) {
+static void my_custom_texture_class_init(MyCustomTextureClass *klass) {
   FL_PIXEL_BUFFER_TEXTURE_CLASS(klass)->copy_pixels =
       my_custom_texture_copy_pixels;
 }
@@ -433,7 +611,7 @@ int64_t than_pkg_linux_plugin_ffi_create_texture() {
     return -1;
   }
 
-  auto* tex = reinterpret_cast<MyCustomTexture*>(
+  auto *tex = reinterpret_cast<MyCustomTexture *>(
       g_object_new(my_custom_texture_get_type(), nullptr));
 
   fl_texture_registrar_register_texture(g_texture_registrar, FL_TEXTURE(tex));
@@ -454,7 +632,7 @@ void than_pkg_linux_plugin_ffi_dispose_texture(int64_t texture_id) {
 
   auto it = g_active_textures.find(texture_id);
   if (it != g_active_textures.end()) {
-    MyCustomTexture* tex = it->second;
+    MyCustomTexture *tex = it->second;
 
     if (g_texture_registrar && tex) {
       // ၁။ Flutter Engine မှာ ဒီ Texture ကို ဆက်မသုံးတော့ကြောင်း သွားဖြုတ်တယ်
@@ -473,14 +651,14 @@ void than_pkg_linux_plugin_ffi_dispose_texture(int64_t texture_id) {
 }
 
 void than_pkg_linux_plugin_ffi_update_texture_pixels(int64_t texture_id,
-                                                     uint8_t* buffer,
+                                                     uint8_t *buffer,
                                                      uint32_t width,
                                                      uint32_t height) {
   std::lock_guard<std::mutex> lock(g_texture_mutex);
 
   auto it = g_active_textures.find(texture_id);
   if (it != g_active_textures.end()) {
-    MyCustomTexture* tex = it->second;
+    MyCustomTexture *tex = it->second;
     tex->pixel_buffer = buffer;
     tex->width = width;
     tex->height = height;

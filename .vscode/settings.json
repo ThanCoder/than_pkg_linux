@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/thancoder/projects/flutter_plugins/than_pkg_linux/linux"
+    "cmake.sourceDirectory": "/home/thancoder/projects/flutter_plugins/than_pkg_linux/linux",
+    "cmake.ignoreCMakeListsMissing": true
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 // import 'package:than_pkg_linux/core/events/event_listener.dart';
 import 'package:than_pkg_linux/core/m_channel.dart';
+import 'package:than_pkg_linux/core/path_provider.dart';
+import 'package:than_pkg_linux/core/pkg_info.dart';
 import 'package:than_pkg_linux/core/texture/texture_handler.dart';
 
 export './core/texture/texture_dummy_test.dart';
@@ -14,5 +16,6 @@ class ThanPkgLinux {
 
   late final channel = MChannel(_channel);
   late final textureHandler = TextureHandler();
-  // late final listener = EventListener(_channel);
+  late final info = PkgInfo(_channel);
+  late final pathHandler = PathProvider(_channel, info);
 }

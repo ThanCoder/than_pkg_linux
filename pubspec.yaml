@@ -1,6 +1,6 @@
 name: than_pkg_linux
 description: "A powerful Flutter plugin for Linux desktop development, providing advanced window management features and low-level pixel buffer texture handling.."
-version: 0.0.1
+version: 0.1.0
 homepage: https://github.com/ThanCoder/than_pkg_linux.git
 repository: https://github.com/ThanCoder/than_pkg_linux.git
 

@@ -32,9 +32,7 @@ class MChannel {
     await _channel.invokeMethod('closeWindow');
   }
 
-  Future<String?> getVersion() async {
-    return await _channel.invokeMethod<String>('getPlatformVersion');
-  }
+  
 
   Future<TWindowSize?> getWindowSize() async {
     final res = await _channel.invokeMapMethod('getWindowSize');
