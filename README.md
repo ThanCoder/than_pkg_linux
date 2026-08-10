@@ -14,12 +14,12 @@ A powerful Flutter plugin for Linux desktop development, providing advanced wind
 ThanPkgLinux.getInstance.[whatever your want!]
 ```
 
-+ [x] [`MChannel`](#m-channel)
-+ [x] [`TextureHandler`](#texturehandler)
-[Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
-+ [x] [`Info`](#info-example)
-+ [x] [`PathProvider`](#pathprovider-example)
-+ [x] [`Launcher`](#launcher-example)
++ [x] [`MChannel Example`](#m-channel-example)
++ [x] [`TextureHandler Example`](#texturehandler-example)
+[Github Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
++ [x] [`Info Example`](#info-example)
++ [x] [`PathProvider Example`](#pathprovider-example)
++ [x] [`Launcher Example`](#launcher-example)
 
 ---
 
@@ -71,7 +71,7 @@ pkg.getApplicationHomeDirectory()
 
 ```
 
-### M Channel
+### M Channel Example
 ```dart
 final pkg = ThanPkgLinux.getInstance.channel;
 
@@ -90,7 +90,7 @@ pkg.setWindowTitle(title)
 pkg.toggleFullScreen()
 ```
 
-### TextureHandler
+### TextureHandler Example
 [Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
 
 ```dart
