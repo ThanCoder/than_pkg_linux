@@ -15,6 +15,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
   "than_pkg_linux_plugin.cc"
+  "src/method_channel.cc"
+  "src/info_handler.cc"
+  "src/window_handler.cc"
+  "src/path_handler.cc"
+  "src/launcher_handler.cc"
+  "src/texture_handler.cc"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment
@@ -37,8 +43,17 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 
 # Source include directories and library dependencies. Add any plugin-specific
 # dependencies here.
+# def -> INTERFACE
 target_include_directories(${PLUGIN_NAME} INTERFACE
-  "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_include_directories(${PLUGIN_NAME} PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/headers"
+  # "${CMAKE_CURRENT_SOURCE_DIR}/include/than_pkg_linux"
+)
+
+
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 # target_link_libraries(${PLUGIN_NAME} PRIVATE gio-unix-2.0) # launcher အတွက်
@@ -83,7 +98,13 @@ if(${include_${PROJECT_NAME}_tests})
       ${PLUGIN_SOURCES}
     )
     apply_standard_settings(${TEST_RUNNER})
-    target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_include_directories(${TEST_RUNNER} PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/include"
+      "${CMAKE_CURRENT_SOURCE_DIR}/headers"
+      # "${CMAKE_CURRENT_SOURCE_DIR}/include/than_pkg_linux"
+    )
+
     target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
     target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
     target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)

@@ -4,26 +4,28 @@ A powerful Flutter plugin for Linux desktop development, providing advanced wind
 
 ## Features
 
-*   **Window Management (`MChannel`):** Easily control window state, size, visibility, and positioning (center, minimize, full screen, etc.) directly from Dart.
-*   **Low-Level Texture Handling (`TextureHandler`):** Render and update raw pixel buffers efficiently using Flutter's `Texture` widget on Linux.
+* **Window Management (`MChannel`):** Easily control window state, size, visibility, and positioning (center, minimize, full screen, etc.) directly from Dart.
+* **Low-Level Texture Handling (`TextureHandler`):** Render and update raw pixel buffers efficiently using Flutter's `Texture` widget on Linux.
 
 ---
 
 ### Example
+
 ```dart
 ThanPkgLinux.getInstance.[whatever your want!]
 ```
 
-+ [x] [`MChannel Example`](#m-channel-example)
-+ [x] [`TextureHandler Example`](#texturehandler-example)
+* [x] [`Window Example`](#window-example)
+* [x] [`TextureHandler Example`](#texturehandler-example)
 [Github Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
-+ [x] [`Info Example`](#info-example)
-+ [x] [`PathProvider Example`](#pathprovider-example)
-+ [x] [`Launcher Example`](#launcher-example)
+* [x] [`Info Example`](#info-example)
+* [x] [`PathProvider Example`](#pathprovider-example)
+* [x] [`Launcher Example`](#launcher-example)
 
 ---
 
 ### Launcher Example
+
 ```dart
 final pkg = ThanPkgLinux.getInstance.launcher;
 
@@ -33,6 +35,7 @@ await pkg.launchApp('vlc')// bool
 ```
 
 ### Info Example
+
 ```dart
 final pkg = ThanPkgLinux.getInstance.info;
 
@@ -43,6 +46,7 @@ pkg.getInstalledApps() // `[InstalledApp(id: $id, name: $name, executable: $exec
 ```
 
 ### PathProvider Example
+
 ```dart
 final pkg = ThanPkgLinux.getInstance.pathHandler;
 
@@ -62,7 +66,6 @@ pkg.getWorkingDirectory()
 pkg.getApplicationTemporaryDirectory() 
 // `/home/[host]/.cache/[com.example.than_pkg_linux]`
 
-
 pkg.getApplicationConfigDirectory() 
 // `/home/[host]/.config/[com.example.than_pkg_linux]`
 
@@ -71,9 +74,10 @@ pkg.getApplicationHomeDirectory()
 
 ```
 
-### M Channel Example
+### Window Example
+
 ```dart
-final pkg = ThanPkgLinux.getInstance.channel;
+final pkg = ThanPkgLinux.getInstance.window;
 
 pkg.centerWindow()
 pkg.closeWindow()
@@ -91,6 +95,7 @@ pkg.toggleFullScreen()
 ```
 
 ### TextureHandler Example
+
 [Example](https://github.com/ThanCoder/than_pkg_linux/blob/main/example/lib/texture_id_example.dart)
 
 ```dart
